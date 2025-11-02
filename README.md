@@ -18,6 +18,8 @@ A production-grade agent that converts natural language questions into correct, 
 
 ## Quick Start
 
+> **💡 Using VS Code?** See the detailed [VS Code Setup Guide](VSCODE_SETUP.md) for step-by-step instructions on opening and running this project in Visual Studio Code.
+
 ### Installation
 
 ```bash
