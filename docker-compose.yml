@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  nl2sql-api:
+    build: .
+    container_name: nl2sql-agent
+    ports:
+      - "8000:8000"
+    environment:
+      - LOG_LEVEL=info
+    volumes:
+      # Mount data directory for file-based queries (optional)
+      - ./data:/data:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+# Usage:
+# docker-compose up -d          # Start in background
+# docker-compose logs -f        # View logs
+# docker-compose down           # Stop and remove containers

@@ -1,0 +1,183 @@
+{
+  "snowflake_example": {
+    "dialect": "snowflake",
+    "catalog": "PROD_DB",
+    "schema": "ANALYTICS",
+    "tables": [
+      {
+        "name": "orders",
+        "description": "Customer orders table",
+        "columns": [
+          {"name": "order_id", "type": "INTEGER", "description": "Unique order ID"},
+          {"name": "customer_id", "type": "INTEGER", "description": "Customer ID"},
+          {"name": "order_date", "type": "DATE", "description": "Date order was placed"},
+          {"name": "order_status", "type": "VARCHAR", "description": "Order status"},
+          {"name": "total_amount", "type": "DECIMAL", "description": "Total order amount"}
+        ],
+        "rowcount_estimate": 1000000
+      },
+      {
+        "name": "customers",
+        "description": "Customer information",
+        "columns": [
+          {"name": "customer_id", "type": "INTEGER", "description": "Unique customer ID"},
+          {"name": "customer_name", "type": "VARCHAR", "description": "Customer name"},
+          {"name": "region", "type": "VARCHAR", "description": "Geographic region"}
+        ],
+        "rowcount_estimate": 50000
+      }
+    ],
+    "constraints": {
+      "time_range": "last_90_days",
+      "filters": ["order_status IN ('shipped', 'delivered')"],
+      "join_hints": ["orders.customer_id -> customers.customer_id"]
+    },
+    "question": "Show the top 10 customers by total order amount in the last 90 days"
+  },
+
+  "databricks_example": {
+    "dialect": "databricks",
+    "catalog": "main",
+    "schema": "sales",
+    "tables": [
+      {
+        "name": "events",
+        "description": "User events tracking",
+        "columns": [
+          {"name": "event_id", "type": "BIGINT", "description": "Event ID"},
+          {"name": "user_id", "type": "BIGINT", "description": "User ID"},
+          {"name": "event_type", "type": "STRING", "description": "Type of event"},
+          {"name": "event_time", "type": "TIMESTAMP", "description": "Event timestamp"},
+          {"name": "event_value", "type": "DOUBLE", "description": "Event value"}
+        ],
+        "rowcount_estimate": 10000000
+      }
+    ],
+    "constraints": {
+      "time_range": "last_30_days"
+    },
+    "question": "Calculate the 7-day moving average of daily active users"
+  },
+
+  "duckdb_csv_example": {
+    "dialect": "duckdb",
+    "tables": [],
+    "files": [
+      {
+        "path": "/mnt/data/sales_2025.csv",
+        "format": "csv",
+        "name": "sales_2025",
+        "inferred_types": {
+          "order_date": "DATE",
+          "quantity": "INTEGER",
+          "unit_price": "DOUBLE",
+          "discount_pct": "DOUBLE"
+        }
+      }
+    ],
+    "question": "Show monthly revenue from the sales data, accounting for discounts"
+  },
+
+  "postgres_example": {
+    "dialect": "postgres",
+    "schema": "public",
+    "tables": [
+      {
+        "name": "products",
+        "description": "Product catalog",
+        "columns": [
+          {"name": "product_id", "type": "INTEGER", "description": "Product ID"},
+          {"name": "product_name", "type": "VARCHAR", "description": "Product name"},
+          {"name": "category", "type": "VARCHAR", "description": "Product category"},
+          {"name": "price", "type": "NUMERIC", "description": "Product price"}
+        ]
+      },
+      {
+        "name": "sales",
+        "description": "Sales transactions",
+        "columns": [
+          {"name": "sale_id", "type": "INTEGER", "description": "Sale ID"},
+          {"name": "product_id", "type": "INTEGER", "description": "Product ID"},
+          {"name": "quantity", "type": "INTEGER", "description": "Quantity sold"},
+          {"name": "sale_date", "type": "DATE", "description": "Sale date"}
+        ]
+      }
+    ],
+    "constraints": {
+      "join_hints": ["sales.product_id -> products.product_id"],
+      "time_range": "2025-01-01..2025-12-31"
+    },
+    "question": "Which product categories generated the most revenue in 2025?"
+  },
+
+  "mysql_example": {
+    "dialect": "mysql",
+    "schema": "ecommerce",
+    "tables": [
+      {
+        "name": "orders",
+        "columns": [
+          {"name": "order_id", "type": "INT", "description": "Order ID"},
+          {"name": "customer_id", "type": "INT", "description": "Customer ID"},
+          {"name": "order_date", "type": "DATE", "description": "Order date"},
+          {"name": "total", "type": "DECIMAL", "description": "Order total"}
+        ]
+      }
+    ],
+    "constraints": {
+      "time_range": "last_60_days"
+    },
+    "question": "Show the top 20 orders by total amount in the last 60 days"
+  },
+
+  "complex_metrics_example": {
+    "dialect": "snowflake",
+    "schema": "ANALYTICS",
+    "tables": [
+      {
+        "name": "orders",
+        "columns": [
+          {"name": "order_id", "type": "INTEGER"},
+          {"name": "customer_id", "type": "INTEGER"},
+          {"name": "warehouse_id", "type": "INTEGER"},
+          {"name": "order_date", "type": "DATE"}
+        ]
+      },
+      {
+        "name": "order_lines",
+        "columns": [
+          {"name": "order_id", "type": "INTEGER"},
+          {"name": "quantity", "type": "INTEGER"},
+          {"name": "unit_price", "type": "DECIMAL"},
+          {"name": "discount_pct", "type": "DECIMAL"}
+        ]
+      },
+      {
+        "name": "returns",
+        "columns": [
+          {"name": "order_id", "type": "INTEGER"},
+          {"name": "refund_amount", "type": "DECIMAL"}
+        ]
+      },
+      {
+        "name": "warehouses",
+        "columns": [
+          {"name": "warehouse_id", "type": "INTEGER"},
+          {"name": "region", "type": "VARCHAR"}
+        ]
+      }
+    ],
+    "constraints": {
+      "time_range": "last_90_days",
+      "join_hints": [
+        "orders.order_id -> order_lines.order_id",
+        "orders.order_id -> returns.order_id",
+        "orders.warehouse_id -> warehouses.warehouse_id"
+      ],
+      "metric_definitions": {
+        "net_revenue": "SUM(ol.quantity * ol.unit_price * (1 - ol.discount_pct)) - COALESCE(SUM(r.refund_amount), 0)"
+      }
+    },
+    "question": "Calculate net revenue by region for the last 90 days, accounting for discounts and returns"
+  }
+}
