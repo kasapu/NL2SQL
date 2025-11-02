@@ -30,11 +30,13 @@ htmlcov/
 .tox/
 
 # IDE
-.vscode/
 .idea/
 *.swp
 *.swo
 *~
+
+# VS Code - keep configuration but ignore workspace file
+.vscode/*.code-workspace
 
 # Environment
 .env
